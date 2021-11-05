@@ -1,0 +1,69 @@
+---
+- name: Install MacOS Packages
+  hosts: localhost
+  tasks:
+
+  - name: Add brew taps
+    community.general.homebrew_tap:
+      name: "{{ item }}"
+    ignore_errors: yes
+    with_items:
+      - homebrew/cask-fonts
+    tags: 
+      - install
+      - common
+
+  - name: Install brew cask common packages
+    community.general.homebrew_cask:
+      name: "{{ item }}"
+    ignore_errors: yes
+    with_items:
+      - alfred
+      - brave-browser
+      - font-fira-code
+      - iterm2
+      - lastpass
+      - rectangle
+      - visual-studio-code
+    tags: 
+      - install
+      - common
+
+  - name: Install brew cask work packages
+    community.general.homebrew_cask:
+      name: "{{ item }}"
+    ignore_errors: yes
+    with_items:
+      - microsoft-office
+      - microsoft-teams
+      - slack
+    tags: 
+      - install
+      - work
+  
+  - name: "Install brew packages"
+    community.general.homebrew:
+      name: "{{ item }}"
+    ignore_errors: yes
+    with_items:
+      - node
+      - dockutil
+    tags:
+      - install
+      - common
+
+  - name: Faster hiding for dock
+    shell: defaults write com.apple.dock autohide-time-modifier -float 0.1;killall Dock
+    tags:
+      - common
+
+  - name: Remove dock icons
+    shell: "dockutil --remove all"
+    tags: common
+
+  - name: Install zsh autosuggestions
+    ansible.builtin.git:
+      repo: "https://github.com/zsh-users/zsh-autosuggestions.git"
+      dest: "~/.oh-my-zsh/plugins/zsh-autosuggestions"
+    tags: common
+      
